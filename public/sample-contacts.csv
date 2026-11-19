@@ -1,0 +1,9 @@
+first_name,last_name,business_name,phone,email,city,state,industry,tags,line_type,consent_voice,consent_sms,consent_note
+Marcus,Reed,Fresh Cutz Barbershop,+15125550101,marcus@example.com,Austin,TX,,prospect;barber,landline,yes,yes,Web form 2026-10-02
+Rosa,Martinez,Rosa's Cantina,+15125550102,rosa@example.com,Austin,TX,,prospect,landline,yes,yes,Event sign-up sheet 2026-09-14
+Dale,Hughes,Summit Roofing & Exteriors,+12145550103,dale@example.com,Dallas,TX,,prospect;storm,unknown,,,
+Priya,Shah,Cool Breeze HVAC,+17135550104,priya@example.com,Houston,TX,,prospect,mobile,yes,yes,Web form 2026-10-21
+Tom,Becker,Rapid Rooter Plumbing,+14805550105,tom@example.com,Phoenix,AZ,,prospect,mobile,,,
+Angela,Kim,Bright Smile Dental,+13035550106,angela@example.com,Denver,CO,,prospect;dental,landline,yes,yes,Webinar registration 2026-08-30
+Luis,Ortega,Green Acres Lawn Care,+12105550107,luis@example.com,San Antonio,TX,,prospect,landline,yes,no,Trade show badge scan 2026-07-11
+Sarah,Nguyen,Hill Country Realty,+15125550108,sarah@example.com,Austin,TX,real estate,prospect,landline,yes,yes,Web form 2026-10-05
