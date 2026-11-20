@@ -14,6 +14,7 @@ if (fs.existsSync(envFile)) {
     if (!m || line.trim().startsWith('#')) continue;
     let v = m[2];
     if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) v = v.slice(1, -1);
+    else v = v.replace(/\s+#.*$/, '').trim(); // strip inline comments on unquoted values
     if (process.env[m[1]] === undefined) process.env[m[1]] = v;
   }
 }
