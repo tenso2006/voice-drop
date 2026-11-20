@@ -276,7 +276,7 @@ function callbackUrl(provider) {
   return config.publicBaseUrl ? `${config.publicBaseUrl}/webhooks/voicedrop/${provider}?token=${encodeURIComponent(config.webhookSecret)}` : null;
 }
 
-async function processOne(campaign, cc) {
+async function processOne(campaign, cc, now = new Date()) {
   const settings = getSettings();
   const contact = getContact(cc.contact_id);
   const comp = checkContact(contact, { channel: 'voice', campaignId: campaign.id, settings });
@@ -286,7 +286,7 @@ async function processOne(campaign, cc) {
     audit('delivery.blocked', 'campaign_contact', cc.id, comp.notes, 'system');
     return { status: 'skipped', reason: 'compliance' };
   }
-  const win = withinCallingWindow(contact, new Date(), settings);
+  const win = withinCallingWindow(contact, now, settings);
   if (!win.ok) return { status: 'deferred', reason: `Outside calling window (${win.start}–${win.end} ${win.tz})` };
 
   const delivery = activeDelivery();
@@ -323,7 +323,7 @@ export async function workflowTag(contact, event, settings = getSettings()) {
   catch (e) { audit('ghl.tag_failed', 'contact', contact.id, { tag, error: e.message }, 'system'); }
 }
 
-async function sendFollowupSms(campaign, cc) {
+async function sendFollowupSms(campaign, cc, now = new Date()) {
   const settings = getSettings();
   const contact = getContact(cc.contact_id);
   const claim = db.prepare("UPDATE campaign_contacts SET sms_status = 'sending' WHERE id = ? AND sms_status = 'not_sent'").run(cc.id);
@@ -333,7 +333,7 @@ async function sendFollowupSms(campaign, cc) {
   const comp = checkContact(contact, { channel: 'sms', campaignId: -1, settings });
   const blocking = comp.notes.filter((n) => n.level === 'block' && n.code !== 'duplicate');
   if (blocking.length) return skip(blocking[0].msg);
-  if (!withinCallingWindow(contact, new Date(), settings).ok) {
+  if (!withinCallingWindow(contact, now, settings).ok) {
     db.prepare("UPDATE campaign_contacts SET sms_status = 'not_sent' WHERE id = ?").run(cc.id);
     return;
   }
@@ -349,12 +349,12 @@ async function sendFollowupSms(campaign, cc) {
 }
 
 let ticking = false;
-export async function tick() {
+export async function tick(now = new Date()) {
   if (ticking) return; ticking = true;
   try {
     const settings = getSettings();
     if (settings.globalStop) return;
-    db.prepare("UPDATE campaigns SET status = 'running' WHERE status = 'scheduled' AND scheduled_at <= ?").run(new Date().toISOString());
+    db.prepare("UPDATE campaigns SET status = 'running' WHERE status = 'scheduled' AND scheduled_at <= ?").run(now.toISOString());
     const perTick = Math.max(1, Math.round(config.delivery.ratePerMinute / 4)); // tick every 15 s
     for (const campaign of db.prepare("SELECT * FROM campaigns WHERE status = 'running'").all()) {
       const c = getCampaign(campaign.id);
@@ -362,13 +362,13 @@ export async function tick() {
       let sent = 0;
       for (const cc of queued) {
         if (sent >= perTick) break;
-        const r = await processOne(c, cc);
+        const r = await processOne(c, cc, now);
         if (r.status !== 'deferred') sent++;
       }
       if (c.options.sendSms) {
         const due = db.prepare(`SELECT * FROM campaign_contacts WHERE campaign_id = ? AND sms_status = 'not_sent' AND sms_text IS NOT NULL
           AND delivery_status IN ('sent','delivered','handed_off') AND sent_at <= datetime('now', ?) LIMIT 10`).all(c.id, `-${Number(settings.smsFollowupDelayMin) || 0} minutes`);
-        for (const cc of due) await sendFollowupSms(c, cc);
+        for (const cc of due) await sendFollowupSms(c, cc, now);
       }
       const left = db.prepare("SELECT COUNT(*) n FROM campaign_contacts WHERE campaign_id = ? AND delivery_status IN ('queued','sending')").get(c.id).n;
       const smsLeft = c.options.sendSms ? db.prepare("SELECT COUNT(*) n FROM campaign_contacts WHERE campaign_id = ? AND sms_status = 'not_sent' AND delivery_status IN ('sent','delivered','handed_off')").get(c.id).n : 0;

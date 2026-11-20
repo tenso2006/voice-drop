@@ -22,6 +22,8 @@ const { buildTemplate, renderScript, lintScript } = await import('../server/serv
 const { ruleClassify } = await import('../server/services/replies.js');
 const { withinCallingWindow } = await import('../server/services/compliance.js');
 
+// A Wednesday at 18:00 UTC is inside every US state's calling window.
+const NOON = new Date('2026-11-18T18:00:00Z');
 let ttsCalls = 0; const sent = [];
 // 128 kbps MPEG-1 Layer III frame header + padding = a tiny "MP3"
 const fakeMp3 = (n) => Buffer.concat([Buffer.from([0xff, 0xfb, 0x90, 0x64]), Buffer.alloc(16000 * n)]);
@@ -187,13 +189,13 @@ test('full campaign flow: import → scripts → approve → audio (cached) → 
 
   // Global stop blocks the worker
   await call('POST', '/api/settings/global-stop', { on: true });
-  await tick();
+  await tick(NOON);
   assert.equal(sent.length, 0);
   await call('POST', '/api/settings/global-stop', { on: false });
   await call('POST', `/api/campaigns/${cid}/resume`);
 
   // Worker sends (5 per tick at 20/min)
-  await tick(); await tick();
+  await tick(NOON); await tick(NOON);
   assert.equal(sent.length, 6);
   rows = (await call('GET', `/api/campaigns/${cid}`)).data.rows;
   assert.equal(rows.filter((x) => x.delivery_status === 'sent').length, 6);
@@ -219,7 +221,7 @@ test('full campaign flow: import → scripts → approve → audio (cached) → 
   assert.ok(replies.find((x) => x.category === 'pricing').suggested_reply.includes('Pricing depends on your call volume'));
 
   // Campaign completes once nothing is queued
-  await tick();
+  await tick(NOON);
   const camp = (await call('GET', '/api/campaigns')).data.find((x) => x.id === cid);
   assert.equal(camp.status, 'completed');
   assert.equal(camp.replies, 2);
