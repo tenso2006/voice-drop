@@ -100,7 +100,7 @@ app.get('/health', (req, res) => { db.prepare('SELECT 1').get(); res.json({ ok: 
 app.use('/api', (req, res, next) => (authed(req) ? next() : res.status(401).json({ error: 'Login required' })), api);
 
 // ------------------------------------------------------------- frontend -----
-app.use(express.static(path.join(config.root, 'public'), { index: 'index.html', maxAge: isTest ? 0 : '1h' }));
+app.use(express.static(path.join(config.root, 'public'), { index: 'index.html', etag: true, lastModified: true, setHeaders: (res) => res.setHeader('Cache-Control', 'no-cache') }));
 app.get(/^\/(?!api|media|webhooks|auth).*/, (req, res) => res.sendFile(path.join(config.root, 'public', 'index.html')));
 
 // ------------------------------------------------------------- errors -------
