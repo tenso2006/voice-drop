@@ -30,6 +30,7 @@ Docker: `docker build -t voicedrop .` then `docker run -p 3000:3000 --env-file .
 
 | Area | Status | Notes |
 |---|---|---|
+| Prospecting | ✅ (needs Google key) | Search Google Places (official API) by niche plus ZIP, city or address. Each business gets a 0–100 **Missed-Call Opportunity Score** from review complaints about phones, volume, hours, website booking/chat, rating, and your own test-call results. Comes with a live SDR call script (gatekeeper, opener, hook, pitch, ask, objections, voicemail). Add to Contacts or **Send to GHL** (upsert, assign to an SDR, script saved as a note). Review text is used for scoring only and never stored. |
 | GHL contact sync | ✅ | Private Integration token. Contacts, tags, custom fields, DND per channel, pipeline stage. Read-only. |
 | CSV import | ✅ | Flexible column names; extra columns become custom fields. `public/sample-contacts.csv` is a sample. |
 | Contact dashboard | ✅ | Search; filter by tag, industry, pipeline stage, custom field, consent and source; pagination; select page, select all matching, deselect all. |
@@ -64,6 +65,7 @@ All secrets stay in `.env` on the server. The browser only sees "configured: yes
 | `PUBLIC_BASE_URL` | Public HTTPS URL of the app. Delivery providers fetch MP3s from `/media/<sha256>.mp3`. |
 | `WEBHOOK_SECRET` | Required token for `/webhooks/*`. |
 | `GHL_PRIVATE_TOKEN`, `GHL_LOCATION_ID` | GHL sub-account Private Integration. Scopes: contacts.readonly, contacts.write, locations.readonly, locations/customFields.readonly, locations/tags.readonly, opportunities.readonly, conversations.readonly, conversations/message.write. |
+| `GOOGLE_PLACES_API_KEY` | Prospecting. Enable "Places API (New)" in Google Cloud and restrict the key to it. GHL token also needs `users.readonly` to list SDRs. |
 | `OPENAI_API_KEY` | TTS (and optional text AI). |
 | `ANTHROPIC_API_KEY` | Optional AI polish and reply classification (default model `claude-haiku-5-5`). |
 | `ELEVENLABS_API_KEY`, `TTS_PROVIDER` | Alternative TTS vendor. |

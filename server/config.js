@@ -74,6 +74,12 @@ export const config = {
     ratePerMinute: num('VOICEDROP_RATE_PER_MINUTE', 20),
   },
 
+  leads: {
+    googleKey: e('GOOGLE_PLACES_API_KEY'),
+    costPer1k: num('PRICE_PLACES_PER_1K', 40), // Text Search with reviews ("Enterprise + Atmosphere" tier)
+    freePerMonth: num('PLACES_FREE_REQUESTS_PER_MONTH', 1000),
+  },
+
   sms: { costPerSegment: num('SMS_COST_PER_SEGMENT', 0.0079) },
 
   // Compliance defaults (editable in Settings; these are only the first-run values)

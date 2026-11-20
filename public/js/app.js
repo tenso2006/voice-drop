@@ -1,6 +1,7 @@
 import { api, state, esc, icon, toast, confirmDialog, $ } from './core.js';
 import * as dashboard from './pages/dashboard.js';
 import * as contacts from './pages/contacts.js';
+import * as prospecting from './pages/prospecting.js';
 import * as campaigns from './pages/campaigns.js';
 import * as scripts from './pages/scripts.js';
 import * as voices from './pages/voices.js';
@@ -11,6 +12,7 @@ import * as settings from './pages/settings.js';
 
 const NAV = [
   ['dashboard', 'Dashboard', 'dashboard', dashboard],
+  ['prospecting', 'Prospecting', 'search', prospecting],
   ['contacts', 'Contacts', 'contacts', contacts],
   ['builder', 'Campaign Builder', 'builder', campaigns],
   ['scripts', 'AI Script Generator', 'script', scripts],

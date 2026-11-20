@@ -16,6 +16,8 @@ import { ttsCatalog, TTS_STYLES } from '../providers/tts/index.js';
 import { deliveryCatalog, activeDelivery } from '../providers/delivery/index.js';
 import * as ghl from '../providers/crm/ghl.js';
 import { buildZip } from '../services/zip.js';
+import * as prospecting from '../services/prospecting.js';
+import { placesConfigured } from '../providers/leads/googlePlaces.js';
 
 export const api = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
@@ -96,6 +98,17 @@ api.get('/ghl/test', ah(async (req, res) => res.json(await ghl.testConnection())
 api.get('/ghl/tags', ah(async (req, res) => res.json(await ghl.listTags())));
 api.get('/ghl/custom-fields', ah(async (req, res) => res.json(await ghl.listCustomFields())));
 api.get('/ghl/pipelines', ah(async (req, res) => res.json(await ghl.listPipelines())));
+
+// ------------------------------------------------------------ prospecting ---
+api.get('/prospects/meta', (req, res) => res.json({ configured: placesConfigured(), terms: prospecting.SEARCH_TERMS, usage: prospecting.monthUsage(), searches: prospecting.recentSearches() }));
+api.post('/prospects/search', ah(async (req, res) => res.json(await prospecting.search(req.body || {}))));
+api.get('/prospects', (req, res) => res.json(prospecting.listProspects(req.query)));
+api.get('/prospects/:pid', (req, res) => { const p = prospecting.getProspect(req.params.pid); res.json({ ...p, script: prospecting.callScript(p) }); });
+api.patch('/prospects/:pid', (req, res) => res.json(prospecting.setProspectFields(req.params.pid, req.body || {})));
+api.post('/prospects/:pid/test-call', (req, res) => res.json(prospecting.logTestCall(req.params.pid, req.body?.result ?? null)));
+api.post('/prospects/add-contacts', (req, res) => res.json(prospecting.addToContacts(req.body?.ids || [])));
+api.post('/prospects/send-ghl', ah(async (req, res) => res.json(await prospecting.sendToGhl(req.body?.ids || [], { assignedTo: req.body?.assignedTo }))));
+api.get('/ghl/users', ah(async (req, res) => res.json(await ghl.listUsers())));
 
 // ------------------------------------------------------------ preview -------
 api.post('/scripts/preview', (req, res) => {

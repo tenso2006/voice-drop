@@ -1,6 +1,6 @@
 import { api, esc, money, num, badge, label } from '../core.js';
 
-const COLORS = { ai: '#7c3aed', tts: '#2563eb', delivery: '#dc2643', sms: '#0f9d63' };
+const COLORS = { ai: '#7c3aed', tts: '#2563eb', delivery: '#dc2643', sms: '#0f9d63', leads: '#b7791f' };
 
 export async function render(root) {
   const d = await api('costs');
@@ -17,12 +17,12 @@ export async function render(root) {
   </div>
   <div class="grid g2" style="margin-top:16px">
     <div class="card"><div class="card-head"><h2>By category</h2></div>
-      ${['ai', 'tts', 'delivery', 'sms'].map((k) => `<div style="margin-bottom:12px"><div class="row between small"><span><b>${{ ai: 'AI generation', tts: 'Audio (TTS)', delivery: 'Voicemail delivery', sms: 'Follow-up SMS' }[k]}</b></span><span>${money(cat[k] || 0)}</span></div>
+      ${['leads', 'ai', 'tts', 'delivery', 'sms'].map((k) => `<div style="margin-bottom:12px"><div class="row between small"><span><b>${{ leads: 'Lead search (Google)', ai: 'AI generation', tts: 'Audio (TTS)', delivery: 'Voicemail delivery', sms: 'Follow-up SMS' }[k]}</b></span><span>${money(cat[k] || 0)}</span></div>
         <div class="bar"><span style="width:${d.total ? ((cat[k] || 0) / d.total) * 100 : 0}%;background:${COLORS[k]}"></span></div></div>`).join('')}
     </div>
     <div class="card"><div class="card-head"><h2>Last 30 days</h2><div class="legend">${Object.entries(COLORS).map(([k, c]) => `<span><i style="background:${c}"></i>${k.toUpperCase()}</span>`).join('')}</div></div>
       ${days.length ? `<div class="chart">${days.map((day) => `<div class="col" title="${day}: ${money(d.daily.filter((x) => x.day === day).reduce((s, x) => s + x.amount, 0))}" style="height:100%">
-        ${['ai', 'tts', 'delivery', 'sms'].map((k) => { const v = d.daily.find((x) => x.day === day && x.category === k)?.amount || 0; return v ? `<span style="height:${(v / max) * 100}%;background:${COLORS[k]}"></span>` : ''; }).join('')}</div>`).join('')}</div>
+        ${['leads', 'ai', 'tts', 'delivery', 'sms'].map((k) => { const v = d.daily.find((x) => x.day === day && x.category === k)?.amount || 0; return v ? `<span style="height:${(v / max) * 100}%;background:${COLORS[k]}"></span>` : ''; }).join('')}</div>`).join('')}</div>
       <div class="row between small muted"><span>${days[0]}</span><span>${days[days.length - 1]}</span></div>` : '<p class="muted">No spend yet.</p>'}
     </div>
   </div>

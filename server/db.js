@@ -111,6 +111,27 @@ CREATE TABLE IF NOT EXISTS costs (
   created_at TEXT DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS prospect_searches (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  query TEXT, industry TEXT, location TEXT, requests INTEGER DEFAULT 0, results INTEGER DEFAULT 0,
+  cost REAL DEFAULT 0, created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Businesses found via Google Places. Only business contact info + our own
+-- score is kept; review text is used transiently and never stored.
+CREATE TABLE IF NOT EXISTS prospects (
+  place_id TEXT PRIMARY KEY,
+  search_id INTEGER, name TEXT, phone TEXT, website TEXT, address TEXT, city TEXT, state TEXT, zip TEXT,
+  rating REAL, review_count INTEGER, weekday_text TEXT, primary_type TEXT, industry TEXT, maps_url TEXT,
+  score INTEGER DEFAULT 0, reasons TEXT DEFAULT '[]', signals TEXT DEFAULT '{}',
+  test_call TEXT,                    -- answered | rang_out | voicemail (manual verification)
+  test_call_at TEXT,
+  status TEXT DEFAULT 'new',         -- new | added | dismissed
+  contact_id TEXT, ghl_contact_id TEXT, assigned_to TEXT,
+  created_at TEXT DEFAULT (datetime('now')), updated_at TEXT DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_prospects_search ON prospects(search_id);
+
 CREATE TABLE IF NOT EXISTS audit_log (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   actor TEXT DEFAULT 'user', action TEXT NOT NULL, entity TEXT, entity_id TEXT, detail TEXT,

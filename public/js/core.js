@@ -91,6 +91,7 @@ export const industryLabel = (key) => state.options?.industries.find((i) => i.ke
 export const industrySelect = (value, attrs = '') => `<select ${attrs}>${state.options.industries.map((i) => `<option value="${i.key}" ${i.key === value ? 'selected' : ''}>${esc(i.label)}</option>`).join('')}</select>`;
 
 export const ICONS = {
+  search: 'M15.5 14h-.8l-.3-.3A6.5 6.5 0 1 0 14 15.5l.3.3v.8l5 5 1.5-1.5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z',
   dashboard: 'M3 13h8V3H3zm0 8h8v-6H3zm10 0h8V11h-8zm0-18v6h8V3z',
   contacts: 'M16 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm-8 1a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm8 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4zm-8 0c-.3 0-.7 0-1.1.1A4.7 4.7 0 0 1 9 18v2H1v-2c0-2 3.6-3.4 7-4z',
   builder: 'M3 17.2V21h3.8l11-11-3.8-3.8zM20.7 7a1 1 0 0 0 0-1.4l-2.3-2.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.8 3.8z',

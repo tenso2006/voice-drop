@@ -163,3 +163,16 @@ export async function setCustomField(contactId, key, value) {
 export async function addNote(contactId, body) {
   return ghl('POST', `/contacts/${contactId}/notes`, { body: { body } });
 }
+
+// Create or update by phone/email (GHL de-duplicates using the location's rules).
+export async function upsertContact(fields) {
+  const body = { locationId: loc() };
+  for (const [k, v] of Object.entries(fields)) if (v !== undefined && v !== null && v !== '') body[k] = v;
+  return ghl('POST', '/contacts/upsert', { body });
+}
+
+// Team members, for assigning prospects to an SDR (scope: users.readonly).
+export async function listUsers() {
+  const d = await ghl('GET', '/users/', { query: { locationId: loc() } });
+  return (d.users || []).map((u) => ({ id: u.id, name: u.name || [u.firstName, u.lastName].filter(Boolean).join(' '), email: u.email, role: u.roles?.role }));
+}
